@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>StoreGuide AI · 门店导购助手（交互原型）</title>
+<style>
+:root{
+  --brand:#0f766e; --brand2:#14b8a6; --accent:#f97316; --bg:#f1f5f9;
+  --card:#fff; --txt:#0f172a; --sub:#64748b; --line:#e2e8f0;
+  --ok:#0f766e; --warn:#d97706; --bad:#dc2626;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0b1220;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.stage{min-height:100%;display:flex;gap:20px;align-items:center;justify-content:center;padding:16px;flex-wrap:wrap}
+.phone{width:390px;max-width:100%;height:812px;max-height:94vh;background:var(--bg);border-radius:38px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 0 11px #111827;overflow:hidden;display:flex;flex-direction:column;position:relative}
+@media(max-width:460px){.stage{padding:0}.phone{height:100vh;max-height:none;border-radius:0;box-shadow:none}}
+header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:14px 16px 12px;flex:none}
+.hrow{display:flex;align-items:center;gap:8px}
+.hrow h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.3px}
+.pill{font-size:10px;background:rgba(255,255,255,.22);padding:2px 7px;border-radius:20px}
+.pill.live{background:#16a34a}
+.pill.demo{background:#f97316}
+.sub{font-size:11px;opacity:.85;margin-top:4px;line-height:1.5}
+.gear{margin-left:auto;background:rgba(255,255,255,.18);border:0;color:#fff;width:28px;height:28px;border-radius:8px;font-size:14px}
+main{flex:1;overflow-y:auto;padding:12px 12px 8px;scroll-behavior:smooth}
+.msg{margin-bottom:12px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.me{display:flex;justify-content:flex-end}
+.me .bub{background:var(--brand);color:#fff;padding:9px 12px;border-radius:14px 14px 4px 14px;max-width:78%;font-size:14px;line-height:1.5}
+.bot{display:flex;gap:7px;align-items:flex-start}
+.av{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--accent));
+  color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;font-weight:700}
+.card{background:var(--card);border-radius:4px 14px 14px 14px;padding:11px 12px;flex:1;min-width:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tag{font-size:10px;padding:1px 6px;border-radius:5px;background:#e2e8f0;color:var(--sub)}
+.tag.i{background:#ccfbf1;color:#0f766e;font-weight:600}
+.tag.ok{background:#dcfce7;color:#15803d}.tag.fb{background:#fef3c7;color:#b45309}.tag.bl{background:#fee2e2;color:#b91c1c}
+.tag.t{background:#eff6ff;color:#1d4ed8}
+.seg{margin:7px 0}
+.seg .k{font-size:11px;color:var(--brand);font-weight:700;margin-bottom:2px;letter-spacing:.5px}
+.seg .v{font-size:13.5px;color:var(--txt);line-height:1.6}
+.seg.script .v{background:#fff7ed;border-left:3px solid var(--accent);padding:7px 9px;border-radius:0 7px 7px 0;font-size:13.5px}
+.src{margin-top:9px;border-top:1px dashed var(--line);padding-top:7px;font-size:11px;color:var(--sub);line-height:1.6}
+.src b{color:#0369a1;font-weight:600}
+.disc{font-size:10.5px;color:#94a3b8;margin-top:6px}
+.acts{display:flex;gap:6px;margin-top:9px}
+.acts button{flex:1;font-size:11.5px;padding:6px 0;border:1px solid var(--line);background:#fff;border-radius:8px;color:var(--sub)}
+.acts button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.acts button.cp{color:var(--brand);border-color:#99f6e4}
+.typing span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#94a3b8;margin-right:3px;animation:b 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1;transform:translateY(-3px)}}
+.welcome{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:12px}
+.welcome h2{font-size:14px;margin:0 0 4px}
+.welcome p{font-size:11.5px;color:var(--sub);margin:0 0 11px;line-height:1.6}
+.sugs{display:flex;flex-direction:column;gap:7px}
+.sug{border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;background:#f8fafc;color:var(--txt)}
+.sug small{display:block;color:var(--brand);font-size:10px;margin-top:2px}
+.sug:active{background:#e2e8f0}
+footer{flex:none;background:#fff;border-top:1px solid var(--line);padding:7px 10px 12px}
+.quick{display:flex;gap:6px;overflow-x:auto;padding-bottom:7px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;font-size:11.5px;padding:5px 10px;border-radius:20px;border:1px solid var(--line);background:#f8fafc;color:var(--sub)}
+.inrow{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:14px;
+  font-family:inherit;height:40px;background:#f8fafc;outline:none}
+textarea:focus{border-color:var(--brand2);background:#fff}
+.send{width:40px;height:40px;border-radius:12px;border:0;background:var(--brand);color:#fff;font-size:16px;flex:none}
+.send:disabled{background:#cbd5e1}
+.panel{position:absolute;inset:0;background:rgba(15,23,42,.5);display:none;align-items:flex-end;z-index:9}
+.panel.on{display:flex}
+.sheet{background:#fff;width:100%;border-radius:18px 18px 0 0;padding:18px 16px 22px;max-height:80%;overflow:auto}
+.sheet h3{margin:0 0 4px;font-size:15px}
+.sheet p{font-size:11.5px;color:var(--sub);margin:0 0 12px;line-height:1.6}
+.sheet label{display:block;font-size:12px;color:var(--txt);margin:10px 0 4px;font-weight:600}
+.sheet input,.sheet select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit}
+.sheet .btn{width:100%;margin-top:16px;padding:11px;border:0;border-radius:11px;background:var(--brand);color:#fff;font-size:14px}
+.stats{font-size:12px;color:var(--sub);line-height:1.9}
+.stats b{color:var(--txt);font-size:15px}
+.note{width:340px;max-width:100%;color:#94a3b8;font-size:12px;line-height:1.85;background:#111827;border-radius:14px;padding:16px}
+.note h3{color:#fff;margin:0 0 8px;font-size:14px}
+.note code{background:#1f2937;padding:1px 5px;border-radius:4px;color:#5eead4;font-size:11px}
+.note a{color:#5eead4}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="phone">
+  <header>
+    <div class="hrow">
+      <h1>StoreGuide AI</h1>
+      <span class="pill demo" id="modePill">演示模式</span>
+      <span class="pill">门店 · 示例</span>
+      <button class="gear" id="gear">⚙</button>
+    </div>
+    <div class="sub">内部知识助手 · 仅对导购开放 · 价格与政策以门店系统为准</div>
+  </header>
+
+  <main id="feed">
+    <div class="welcome" id="welcome">
+      <h2>今天需要查什么？</h2>
+      <p>我可以帮你确认<strong>尺码、活动规则、商品卖点、售后政策</strong>和<strong>顾客异议怎么回</strong>。<br>
+      查不到依据时我会直接告诉你"不知道"，不会编答案给你。</p>
+      <div class="sugs" id="sugs"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="quick" id="quick"></div>
+    <div class="inrow">
+      <textarea id="inp" placeholder="例如：孩子128偏瘦拿130还是140" rows="1"></textarea>
+      <button class="send" id="send">➤</button>
+    </div>
+  </footer>
+
+  <div class="panel" id="panel">
+    <div class="sheet">
+      <h3>连接你的 Dify 应用</h3>
+      <p>演示模式使用内置的脚本答案（离线可看）。切到真实模式后，本页面会直接调用你发布的 Dify Chatflow API，用于答辩现场演示。</p>
+      <label>模式</label>
+      <select id="mMode"><option value="demo">演示（内置脚本）</option><option value="live">真实（Dify API）</option></select>
+      <label>API Base URL</label>
+      <input id="mUrl" placeholder="https://api.dify.ai/v1">
+      <label>API Key（app-xxxx）</label>
+      <input id="mKey" placeholder="app-..." type="password">
+      <label>用户标识</label>
+      <input id="mUser" value="prototype-user">
+      <div class="stats" style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+        <div>本次会话：提问 <b id="stAsk">0</b> · 采纳 <b id="stCopy">0</b> · 兜底 <b id="stFb">0</b> · 拦截 <b id="stBlk">0</b></div>
+        <div>采纳率 <b id="stRate">—</b> ｜ 兜底率 <b id="stFbRate">—</b></div>
+        <div style="font-size:11px;margin-top:6px">采纳率 = (复制+👍) / 提问。兜底率含拦截。兜底率 0% 通常意味着检索阈值过松，不是好事。</div>
+      </div>
+      <button class="btn" id="saveCfg">保存并关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <h3>关于这个原型</h3>
+  这是<strong style="color:#e2e8f0">产品原型</strong>，不是最终实现，用于验证三件事：<br>
+  ① <strong style="color:#e2e8f0">四段式输出</strong>（结论/依据/可念话术/下一步）是否真的能被导购当场使用；<br>
+  ② <strong style="color:#e2e8f0">冷启动建议问题</strong>能否把用户引导到知识库覆盖度最高的场景；<br>
+  ③ <strong style="color:#e2e8f0">拒答与拦截</strong>在界面上如何表达才不显得"产品不行"。<br><br>
+  内置答案基于 <code>05_Dify搭建/知识库语料/</code> 的<strong style="color:#e2e8f0">虚构示例数据</strong>，用规则脚本模拟 RAG 输出，离线可演示。<br>
+  点右上角 ⚙ 填入你自己的 Dify <code>app-xxx</code> Key，即可变成真实问答。<br><br>
+  <span style="color:#64748b">原型文件：<code>04_原型/index.html</code> · 单文件零依赖 · 手机浏览器直接打开</span>
+</div>
+</div>
+
+<script>
+/* ---------- 内置演示知识库（全部为虚构示例数据） ---------- */
+const KB=[
+ {k:['尺码','选码','拿什么码','该穿'],intent:'尺码',
+  c:'需要先确认身高和体重，只看年龄会选错',
+  b:'"年龄只是辅助，永远以身高+体重为准；鞋以脚长为准" ——《童装尺码与版型对照表》第二/四节',
+  s:'童装得看身高体重才准，同岁能差十厘米呢。孩子身高大概多少？我按号型给您拿。',
+  n:'追问身高 cm 与体重 kg 后再给结论',
+  src:'KB-SIZE-001 · 需补槽位',score:'0.58'},
+ {k:['128','130还是140','偏瘦','拿多大','穿多大码','号型'],intent:'尺码',
+  c:'建议 130；若近期长得快可选 140',
+  b:'"130 档适合身高 125–135 cm"；128 落在区间内且距上界还有 7 cm ——《童装尺码与版型对照表》第六节',
+  s:'孩子这个身高正好在 130 这一档，我先给您拿 130。如果他最近长得快，140 也能穿，袖子卷一下就行——两码都试试？',
+  n:'拿 130 与 140 两码让他试穿',
+  src:'KB-SIZE-001 · 生效 2026-09-01',score:'0.78'},
+ {k:['脚长','19','鞋码','穿多少鞋'],intent:'尺码',
+  c:'脚长 19 cm → 中国码 34（欧码 33）',
+  b:'"34 码内长 20.5 cm，适合脚长 19.3–19.5 cm" ——《童装尺码与版型对照表》第四节',
+  s:'量下来脚长 19 的话拿 34 码，鞋里留了半厘米左右。让他站起来走两步，您看脚跟会不会掉。',
+  n:'让孩子穿平时厚度的袜子试穿',
+  src:'KB-SIZE-001 · 生效 2026-09-01',score:'0.81'},
+ {k:['7岁','几岁','多大','年龄'],intent:'尺码',
+  c:'不能只按年龄判断，需要身高体重',
+  b:'"年龄只是辅助，永远以身高+体重为准" ——《童装尺码与版型对照表》第二节',
+  s:'7 岁孩子身高能差到 10 厘米呢。您方便告诉我孩子身高体重大概多少？我按号型给您拿准的。',
+  n:'追问身高 cm 与体重 kg',
+  src:'KB-SIZE-001',score:'0.66'},
+ {k:['满减','300','叠加','一起用','券'],intent:'规则',
+  c:'满 300 减 30 与新品 9 折券不可叠加',
+  b:'"与其他优惠关系：可与会员折扣叠加；不可与新品 9 折券叠加"（R-01）；"叠加：不可与满减叠加"（R-02）——《门店活动与会员规则》R-08 总表',
+  s:'这两个不能一起用。会员折扣可以叠加，我帮您算一下用哪个更划算。',
+  n:'按顾客会员等级分别试算，交系统确认',
+  src:'KB-PROMO-001 · 生效 2026-09-01 至 2026-09-30',score:'0.86'},
+ {k:['生日','88折','会员','金卡','打几折','积分'],intent:'规则',
+  c:'金卡正价 9 折；生日礼与金卡折扣取低不叠加',
+  b:'"金卡（累计消费满 3000 元）：正价 9 折"（R-03）；"88 折与金卡/黑卡折扣取低者，不叠加"（R-04）',
+  s:'您是金卡会员，正价 9 折。这个月正好是生日月，生日礼是 88 折，系统会取更低的那个折扣，不用另外操作。',
+  n:'结算前确认会员身份已识别',
+  src:'KB-PROMO-001 · R-03/R-04/R-08',score:'0.74'},
+ {k:['轻跑','2代','RT-2101','介绍','卖点','体测'],intent:'卖点',
+  c:'轻跑 2 代：回弹率 52%，单只约 168 g，适合校园体测',
+  b:'"中底回弹率 52%（25℃ 实验室数据）；单只约 168 g（28 码）；前掌弯折点位于第一跖趾关节" ——《儿童运动鞋商品知识》第二节',
+  s:'这双中底回弹 52%，一只才 168 克。您拿在手上折一下——弯的地方正好是孩子跑步时脚掌弯的地方，体测最后 10 米不容易掉速。',
+  n:'递给孩子试穿并让其原地跳两下',
+  src:'KB-PRODUCT-001 · JR-RT-2101',score:'0.83'},
+ {k:['防水','畅野','雨天'],intent:'卖点',
+  c:'防泼水 + 压胶接缝，抗静水压 5000 mm，不防长时间浸泡',
+  b:'"抗静水压 5000 mm（实验室），非潜水级，不防长时间浸泡" ——《儿童运动鞋商品知识》第四节',
+  s:'下雨天踩水洼、走泥路没问题，但不能泡在水里。洗多了防泼水会减弱，到时候店里能补喷。',
+  n:'提示约 30 次水洗后复喷防泼水剂',
+  src:'KB-PRODUCT-001 · JR-TR-3305',score:'0.72'},
+ {k:['贵','太贵','嫌贵','便宜点','价格高'],intent:'话术',
+  c:'先分辨"真贵"还是"想便宜"，再给可验证的价值',
+  b:'"先分辨真贵还是想便宜：立刻问有没有便宜点的→推替代款；看着鞋说有点贵→讲价值" ——《销售话术与异议处理 SOP》三·D',
+  s:'我理解。这双是 399，中底回弹比 299 那双高 7 个点，鞋垫还能抽出来换，能多撑一个学期，算下来一学期不到 200。',
+  n:'递上价格牌并当场对比另一款',
+  src:'KB-SCRIPT-001 · 话术为参考，禁止承诺折扣',score:'0.69'},
+ {k:['网上','电商','线上','更便宜','比价'],intent:'话术',
+  c:'先核货号是否同款，再讲门店权益；禁止贬低线上或称假货',
+  b:'"线上一般是电商专供，型号不一样——您把货号给我，我核对一下是不是同一款" ——《销售话术与异议处理 SOP》三·E',
+  s:'线上确实有便宜的，不过很多是电商专供款，型号不一样。您把货号给我，我核一下是不是同一双。',
+  n:'核对货号；同款则说明试穿/换货/7 天价保',
+  src:'KB-SCRIPT-001',score:'0.71'},
+ {k:['开胶','断了','坏了','质量','三包','保修'],intent:'售后',
+  c:'童鞋三包 3 个月，开胶断底属质量问题，可退可换',
+  b:'"鞋类 3 个月，自购买日起算；开胶、断底、断面、断跟、脱线 → 可退可换" ——《退换货与售后政策》第二节',
+  s:'鞋类三包是 3 个月，开胶属于质量问题，可以直接换或者退，不用您花钱。我查一下您的购买记录。',
+  n:'查小票或会员记录确认购买日',
+  src:'KB-AFTER-001 · 生效 2026-09-01',score:'0.88'},
+ {k:['吊牌','剪了','退货','七天','无理由'],intent:'售后',
+  c:'无理由退货需吊牌完整；质量问题不受吊牌限制',
+  b:'"商品未经使用、未经洗涤、吊牌完整未拆、不影响二次销售"；"质量问题与吊牌无关，仍可按三包处理" ——《退换货与售后政策》一/二节',
+  s:'吊牌剪了的话，无理由退货就办不了了；不过如果是质量问题，跟吊牌没关系，照样能处理。',
+  n:'先判断属于"无理由"还是"质量问题"两条不同路径',
+  src:'KB-AFTER-001',score:'0.77'},
+ {k:['洗','缩水','柔顺剂','干洗','起球','掉色'],intent:'售后',
+  c:'速干面料禁用柔顺剂，会堵塞纤维使速干失效',
+  b:'"速干面料不能用柔顺剂，柔顺剂会堵塞纤维间隙，直接让速干失效" ——《面料与洗护指南》一·速干面料',
+  s:'这件洗的时候千万别放柔顺剂，一放速干功能就没了。冷水反面洗、阴干就行。',
+  n:'提醒顾客洗涤标签并让其拍照留存',
+  src:'KB-FABRIC-001',score:'0.75'},
+];
+const REDLINE={k:['矫正','治疗','内八','扁平足','最好','第一','销量','完全防水','晒不黑','湿疹','杀菌','库存','几双','新款','提成','内购','隔壁品牌','别家','明天就没','不发育'],
+  msg:{'医疗':'孩子的健康问题建议咨询专业医生，我们不做医疗建议。',
+       '绝对化':'"最好/第一/绝对"这类表述违反广告法，我不能这么说。可以改讲可验证的参数，比如回弹率 52%、单只 168 g。',
+       '内部事务':'这属于公司内部事务，请咨询 HR 或店长。',
+       '库存':'库存需要看门店实时系统，我不能凭资料猜。请在 POS 查询或问店长。',
+       '竞品':'我不能评价其他品牌，只讲我们这双的可验证差异。'}};
+const SUGS=[
+ {q:'孩子身高128偏瘦拿130还是140',t:'尺码 · 最高频'},
+ {q:'满300减30能和9折券一起用吗',t:'规则 · 强引用'},
+ {q:'轻跑2代怎么介绍给家长',t:'卖点 · FABE'},
+ {q:'顾客说网上更便宜怎么回',t:'话术 · 异议'},
+];
+const QUICK=['尺码','活动叠加','怎么介绍','顾客嫌贵','开胶能退吗','能矫正内八字吗','还有几双库存'];
+const $=s=>document.querySelector(s);
+const state={cfg:JSON.parse(localStorage.getItem('sg_cfg')||'{}'),ask:0,copy:0,fb:0,blk:0};
+
+/* ---------- UI 初始化 ---------- */
+SUGS.forEach(s=>{const d=document.createElement('div');d.className='sug';d.innerHTML=s.q+'<small>'+s.t+'</small>';
+  d.onclick=()=>ask(s.q);$('#sugs').appendChild(d);});
+QUICK.forEach(q=>{const b=document.createElement('button');b.textContent=q;b.onclick=()=>{$('#inp').value=q;ask(q);};$('#quick').appendChild(b);});
+if(state.cfg.mode==='live')applyMode();
+function applyMode(){$('#modePill').textContent=state.cfg.mode==='live'?'已连接 Dify':'演示模式';
+  $('#modePill').className='pill '+(state.cfg.mode==='live'?'live':'demo');}
+$('#gear').onclick=()=>{['mMode','mUrl','mKey','mUser'].forEach(id=>{if(state.cfg[id.slice(1).toLowerCase()]!==undefined)$('#'+id).value=state.cfg[id.slice(1).toLowerCase()];});$('#panel').classList.add('on');};
+$('#panel').onclick=e=>{if(e.target.id==='panel')$('#panel').classList.remove('on');};
+$('#saveCfg').onclick=()=>{state.cfg={mode:$('#mMode').value,url:$('#mUrl').value,key:$('#mKey').value,user:$('#mUser').value};
+  localStorage.setItem('sg_cfg',JSON.stringify(state.cfg));applyMode();$('#panel').classList.remove('on');};
+$('#send').onclick=()=>{const v=$('#inp').value.trim();if(v){$('#inp').value='';ask(v);}};
+$('#inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#send').click();}});
+function stat(){$('#stAsk').textContent=state.ask;$('#stCopy').textContent=state.copy;$('#stFb').textContent=state.fb;$('#stBlk').textContent=state.blk;
+  $('#stRate').textContent=state.ask?Math.round(state.copy/state.ask*100)+'%':'—';
+  $('#stFbRate').textContent=state.ask?Math.round((state.fb+state.blk)/state.ask*100)+'%':'—';}
+
+/* ---------- 检索与生成（演示模式为规则脚本模拟） ---------- */
+function retrieve(q){
+  let best=null,bs=0;
+  KB.forEach(e=>{let s=0;e.k.forEach(k=>{if(q.includes(k))s+=k.length;});if(s>bs){bs=s;best=e;}});
+  return bs>=1?{hit:best,score:Math.min(0.95,0.55+bs/40)}:null;
+}
+function guard(ans,intent){
+  const hits=REDLINE.k.filter(k=>ans.includes(k));
+  if(hits.length){
+    let cat='绝对化';
+    if(/矫正|治疗|内八|扁平足|湿疹|杀菌/.test(hits.join('')))cat='医疗';
+    if(/提成|内购/.test(hits.join('')))cat='内部事务';
+    if(/库存|几双/.test(hits.join('')))cat='库存';
+    if(/隔壁品牌|别家/.test(hits.join('')))cat='竞品';
+    return {pass:false,reason:cat,hits};
+  }
+  return {pass:true};
+}
+function makeAnswer(q){
+  const rl=guard(q,'query');
+  if(!rl.pass) return {status:'blocked',reason:rl.reason,text:REDLINE.msg[rl.reason]};
+  const r=retrieve(q);
+  if(!r) return {status:'fallback',text:'这个问题我暂时没有查到可靠依据。建议问一下店长，或查看门店最新通知。'};
+  const e=r.hit;
+  return {status:'ok',intent:e.intent,score:r.score,src:e.src,
+    seg:{'结论':e.c,'依据':e.b,'可以这样说':e.s,'下一步':e.n}};
+}
+
+/* ---------- 渲染 ---------- */
+function bubbleMe(t){const d=document.createElement('div');d.className='msg me';d.innerHTML='<div class="bub"></div>';
+  d.querySelector('.bub').textContent=t;$('#feed').appendChild(d);scroll();}
+function scroll(){const f=$('#feed');f.scrollTop=f.scrollHeight;}
+function renderBot(a,lat,t0){
+  const d=document.createElement('div');d.className='msg bot';
+  let html='<div class="av">SG</div><div class="card"><div class="tags">'+
+    (a.status==='ok'?'<span class="tag i">'+a.intent+'</span><span class="tag ok">正常回答</span>':'')+
+    (a.status==='fallback'?'<span class="tag fb">兜底 · 知识库无依据</span>':'')+
+    (a.status==='blocked'?'<span class="tag bl">护栏拦截 · '+a.reason+'</span>':'')+
+    '<span class="tag t">'+lat+' ms</span>'+(a.score?'<span class="tag">召回 '+a.score.toFixed(2)+'</span>':'')+
+    '</div>';
+  if(a.seg){for(const [k,v] of Object.entries(a.seg)){
+      html+='<div class="seg '+(k==='可以这样说'?'script':'')+'"><div class="k">'+(k==='可以这样说'?'▶ '+k:k)+'</div><div class="v"></div></div>';}}
+  else html+='<div class="seg"><div class="v"></div></div>';
+  if(a.src)html+='<div class="src">📎 依据：<b></b></div>';
+  if(a.status==='ok')html+='<div class="disc">⚠️ 以上为参考信息，价格与政策以门店实际系统为准。</div>';
+  if(a.status==='ok')html+='<div class="acts"><button class="cp">📋 复制话术</button><button class="up">👍 有用</button><button class="dn">👎 不对</button></div>';
+  if(a.status==='fallback')html+='<div class="acts"><button class="fb-log">✏️ 记录这个问题，让同事补充</button></div>';
+  html+='</div>';
+  d.innerHTML=html;
+  const vs=d.querySelectorAll('.seg .v');let i=0;
+  const texts=a.seg?Object.values(a.seg):[a.text];
+  $('#feed').appendChild(d);
+  (function typeNext(){if(i>=texts.length)return;
+    const el=vs[i],full=texts[i];let j=0;
+    const t=setInterval(()=>{el.textContent=full.slice(0,j+=Math.ceil(full.length/28));scroll();
+      if(j>=full.length){clearInterval(t);i++;typeNext();}},16);})();
+  if(a.src)d.querySelector('.src b').textContent=a.src;
+  scroll();
+  d.querySelector('.cp')&&(()=>{const b=d.querySelector('.cp');b.onclick=()=>{
+      navigator.clipboard&&navigator.clipboard.writeText(a.seg['可以这样说']);b.textContent='✓ 已复制';state.copy++;stat();
+      setTimeout(()=>b.textContent='📋 复制话术',1400);}})();
+  ['up','dn'].forEach(c=>{const b=d.querySelector('.'+c);if(b)b.onclick=()=>{b.classList.add('on');}});
+  const fl=d.querySelector('.fb-log');if(fl)fl.onclick=()=>{fl.textContent='✓ 已进入知识缺口清单';};
+  if(a.status==='blocked')state.blk++;
+  if(a.status==='fallback')state.fb++;
+  stat();
+}
+async function ask(q){
+  $('#welcome')&&$('#welcome').remove();
+  bubbleMe(q);state.ask++;stat();
+  const t=document.createElement('div');t.className='msg bot';
+  t.innerHTML='<div class="av">SG</div><div class="card"><div class="typing"><span></span><span></span><span></span></div></div>';
+  $('#feed').appendChild(t);scroll();
+  const t0=performance.now();
+  let a,lat;
+  if(state.cfg.mode==='live'&&state.cfg.url&&state.cfg.key){
+    try{
+      const res=await fetch(state.cfg.url.replace(/\/$/,'')+'/chat-messages',{method:'POST',
+        headers:{'Content-Type':'application/json',Authorization:'Bearer '+state.cfg.key},
+        body:JSON.stringify({inputs:{store_code:'PROTO',user_role:'导购'},query:q,response_mode:'blocking',conversation_id:'',user:state.cfg.user||'proto'})});
+      const j=await res.json();lat=Math.round(performance.now()-t0);
+      const srcs=j.metadata&&j.metadata.retriever_resources||[];
+      a={status:/暂时没有查到可靠依据/.test(j.answer||'')?'fallback':'ok',intent:(j.answer||'').match(/【/)?'已路由':'—',
+         text:j.answer||'(空)',src:srcs.map(s=>s.document_name).filter(Boolean).join(' · '),
+         score:srcs[0]&&srcs[0].score};
+      const seg={};['结论','依据','可以这样说','下一步'].forEach(k=>{const m=(j.answer||'').match(new RegExp('【'+k+'】\\s*([\\s\\S]*?)(?=\\n【|$)'));if(m)seg[k]=m[1].trim();});
+      if(Object.keys(seg).length===4)a.seg=seg;
+    }catch(e){a={status:'fallback',text:'接口调用失败：'+e.message};lat=Math.round(performance.now()-t0);}
+  }else{
+    await new Promise(r=>setTimeout(r,520+Math.random()*420));
+    a=makeAnswer(q);lat=Math.round(performance.now()-t0);
+  }
+  t.remove();renderBot(a,lat,t0);
+}
+</script>
+</body>
+</html>
